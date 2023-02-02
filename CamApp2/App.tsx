@@ -22,7 +22,7 @@ const Stack = createStackNavigator<StackParamList>();
 export default function App(): JSX.Element {
   return (
     <StripeProvider
-      publishableKey="pk_test_51LfaIxG2BxuQDWVz85mtNGNT0ulHZfGEnrGrUMtS4RNemK07IYCXgQl1Vj9BCUBjrfYkZXdeC4Lnq65zOsh5M9CL00YJsO7Ymt"
+      publishableKey={STRIPE_PUBLISHABLE_KEY}
       merchantIdentifier="merchant.com.camapp">
       <NavigationContainer>
         <Stack.Navigator
