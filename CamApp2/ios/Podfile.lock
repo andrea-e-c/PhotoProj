@@ -427,6 +427,42 @@ PODS:
     - React-Core
     - React-RCTImage
   - SocketRocket (0.6.0)
+  - Stripe (23.3.3):
+    - StripeApplePay (= 23.3.3)
+    - StripeCore (= 23.3.3)
+    - StripePayments (= 23.3.3)
+    - StripePaymentsUI (= 23.3.3)
+    - StripeUICore (= 23.3.3)
+  - stripe-react-native (0.23.1):
+    - React-Core
+    - Stripe (~> 23.3.0)
+    - StripeApplePay (~> 23.3.0)
+    - StripeFinancialConnections (~> 23.3.0)
+    - StripePayments (~> 23.3.0)
+    - StripePaymentSheet (~> 23.3.0)
+    - StripePaymentsUI (~> 23.3.0)
+  - StripeApplePay (23.3.3):
+    - StripeCore (= 23.3.3)
+  - StripeCore (23.3.3)
+  - StripeFinancialConnections (23.3.3):
+    - StripeCore (= 23.3.3)
+    - StripeUICore (= 23.3.3)
+  - StripePayments (23.3.3):
+    - StripeCore (= 23.3.3)
+    - StripePayments/Stripe3DS2 (= 23.3.3)
+  - StripePayments/Stripe3DS2 (23.3.3):
+    - StripeCore (= 23.3.3)
+  - StripePaymentSheet (23.3.3):
+    - StripeApplePay (= 23.3.3)
+    - StripeCore (= 23.3.3)
+    - StripePayments (= 23.3.3)
+    - StripePaymentsUI (= 23.3.3)
+  - StripePaymentsUI (23.3.3):
+    - StripeCore (= 23.3.3)
+    - StripePayments (= 23.3.3)
+    - StripeUICore (= 23.3.3)
+  - StripeUICore (23.3.3):
+    - StripeCore (= 23.3.3)
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
     - Yoga (~> 1.14)
@@ -496,6 +532,7 @@ DEPENDENCIES:
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
+  - "stripe-react-native (from `../node_modules/@stripe/stripe-react-native`)"
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -514,6 +551,14 @@ SPEC REPOS:
     - libevent
     - OpenSSL-Universal
     - SocketRocket
+    - Stripe
+    - StripeApplePay
+    - StripeCore
+    - StripeFinancialConnections
+    - StripePayments
+    - StripePaymentSheet
+    - StripePaymentsUI
+    - StripeUICore
     - YogaKit
 
 EXTERNAL SOURCES:
@@ -595,6 +640,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
     :path: "../node_modules/react-native-screens"
+  stripe-react-native:
+    :path: "../node_modules/@stripe/stripe-react-native"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -652,9 +699,18 @@ SPEC CHECKSUMS:
   RNReanimated: cc5e3aa479cb9170bcccf8204291a6950a3be128
   RNScreens: ea4cd3a853063cda19a4e3c28d2e52180c80f4eb
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
+  Stripe: e12dd4f24d372fbae7b3090967bd416537a05324
+  stripe-react-native: f8944c62d8d96287f35aa5e527adacc30d2f8560
+  StripeApplePay: b288df6ea5237bec30ff00b8e12b9465684813e6
+  StripeCore: 05ca3061651987b6aeb52028a8de087ad015d555
+  StripeFinancialConnections: eae5e14983f26bc23165f2b897f708e366239f46
+  StripePayments: 63a4c0b41148c83c4197e8ff9f0295dd0829660b
+  StripePaymentSheet: f5e74b3c1fdd9d6ecd0e1075c1ad48d3b574cd26
+  StripePaymentsUI: f9c8a63faf4858f66e2302a717ebb7c928197f53
+  StripeUICore: 784efbcb5ed1e3dc69e4179e1a8feb247d792d81
   Yoga: 921eb014669cf9c718ada68b08d362517d564e0c
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 9fe3072d49df87e06b20226d26db509b91dbcbe3
+PODFILE CHECKSUM: e778fe8ba3b543a6b1e333ccfb63f7a9d429fd63
 
 COCOAPODS: 1.11.3
