@@ -1,9 +1,12 @@
-import React, {useState} from 'react';
-import {View, Text, StyleSheet, Pressable} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {View, Text, StyleSheet, Pressable, Alert} from 'react-native';
 import {Link} from '@react-navigation/native';
-import {X_Pwinty_REST_API_Key} from '@env';
+import {X_Pwinty_REST_API_Key, API_URL} from '@env';
+import {useStripe} from '@stripe/stripe-react-native';
 
 export default function PrintPhotos() {
+  const {initPaymentSheet, presentPaymentSheet} = useStripe();
+
   const [loading, setLoading] = useState(false);
   const [photoUrls, setPhotoUrls] = useState([]);
   const [printData, setPrintData] = useState();
@@ -12,6 +15,72 @@ export default function PrintPhotos() {
   const [items, setItems] = useState(0);
   const [shipping, setShipping] = useState(0);
   const [taxes, setTaxes] = useState(0);
+
+  const createOrder = async () => {
+    fetch('https://api.sandbox.prodigi.com/v4.0/Orders', {
+      method: 'POST',
+      headers: {
+        'X-API-Key': X_Pwinty_REST_API_Key,
+        'Content-type': 'application/json',
+      },
+      body: JSON.stringify(printData),
+    })
+      .then(res => {
+        if (res.ok) {
+          console.log('order request successful');
+        } else {
+          console.log('error', res);
+        }
+        return res;
+      })
+      .catch(error => console.error(error));
+  };
+
+  const fetchPaymentSheetParams = async (total: string) => {
+    const response = await fetch(`${API_URL}/payment-sheet`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        amount: total,
+      }),
+    });
+    const {paymentIntent, ephemeralKey, customer} = await response.json();
+    return {
+      paymentIntent,
+      ephemeralKey,
+      customer,
+    };
+  };
+
+  const initializePaymentSheet = async (totalAmt: string) => {
+    const {paymentIntent, ephemeralKey, customer} =
+      await fetchPaymentSheetParams(totalAmt);
+    const {error} = await initPaymentSheet({
+      customerId: customer,
+      customerEphemeralKeySecret: ephemeralKey,
+      paymentIntentClientSecret: paymentIntent,
+      allowsDelayedPaymentMethods: false,
+    });
+    if (!error) {
+      setLoading(true);
+    }
+  };
+
+  const openPaymentSheet = async () => {
+    const {error} = await presentPaymentSheet();
+    if (error) {
+      Alert.alert(`Error code: ${error.code}`, error.message);
+    } else {
+      Alert.alert('Success! Your order is confirmed.');
+      // send order with prodigi
+      createOrder();
+      // archive album
+      // create new album
+      // navigate back to home screen
+    }
+  };
 
   const fetchQuote = async () => {
     fetch('https://api.sandbox.prodigi.com/v4.0/quotes', {
@@ -57,6 +126,11 @@ export default function PrintPhotos() {
       .catch(error => console.error(error));
   };
 
+  useEffect(() => {
+    fetchQuote();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <View style={styles.sectionContainer}>
       <Text style={styles.mainText}>Print Photos Page Here</Text>
@@ -82,7 +156,7 @@ export default function PrintPhotos() {
       <Pressable
         style={styles.checkoutButton}
         onPress={() => openPaymentSheet()}>
-        <Text>Checkout</Text>
+        {loading ? <Text>Checkout</Text> : <Text>Loading...</Text>}
       </Pressable>
     </View>
   );
