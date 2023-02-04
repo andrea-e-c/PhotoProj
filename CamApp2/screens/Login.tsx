@@ -1,10 +1,34 @@
 import React, {useState} from 'react';
-import {View, Text, StyleSheet, TextInput} from 'react-native';
+import {View, Text, StyleSheet, TextInput, Button} from 'react-native';
 import {Link} from '@react-navigation/native';
+import auth from '@react-native-firebase/auth';
+import {useNavigation} from '@react-navigation/native';
 
 export default function Login() {
+  const navigation = useNavigation();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const loginUser = (uname: string, pw: string) => {
+    auth()
+      .signInWithEmailAndPassword(uname, pw)
+      .then(() => {
+        navigation.navigate('Home');
+        console.log('User account created & signed in!');
+      })
+      .catch(error => {
+        if (error.code === 'auth/email-already-in-use') {
+          console.log('That email address is already in use!');
+        }
+
+        if (error.code === 'auth/invalid-email') {
+          console.log('That email address is invalid!');
+        }
+
+        console.error(error);
+      });
+  };
 
   return (
     <View style={styles.container}>
@@ -39,6 +63,15 @@ export default function Login() {
             secureTextEntry
           />
         </View>
+      </View>
+      <View style={styles.buttonStyle}>
+        <Button
+          style={styles.buttonDeisgn}
+          disabled={!email && !password}
+          onPress={() => loginUser(email, password)}
+          title="Login">
+          LOGIN
+        </Button>
       </View>
     </View>
   );

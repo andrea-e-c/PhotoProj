@@ -1677,7 +1677,7 @@
   "resolved" "https://registry.npmjs.org/@react-native-community/masked-view/-/masked-view-0.1.11.tgz"
   "version" "0.1.11"
 
-"@react-native-firebase/app@^17.0.0":
+"@react-native-firebase/app@^17.0.0", "@react-native-firebase/app@17.0.0":
   "integrity" "sha512-CRMDrqaaC7XSZe5NFczP1gEUfABGWgMmu27rP0mO2CA5zWaZX3FZ42XLsbscem7hpttdGeUBIvHpsLRDg1qANw=="
   "resolved" "https://registry.npmjs.org/@react-native-firebase/app/-/app-17.0.0.tgz"
   "version" "17.0.0"
@@ -1685,6 +1685,14 @@
     "@expo/config-plugins" "^5.0.4"
     "opencollective-postinstall" "^2.0.1"
     "superstruct" "^0.6.2"
+
+"@react-native-firebase/auth@^17.0.0":
+  "integrity" "sha512-AzjQwOYSfBA3ze2L/sJkTRZupzHLObzijHQ5ODe/uaT6JnoMdjMGJjZmqbfjGX30l03oH4v668oECx5XvFCkMQ=="
+  "resolved" "https://registry.npmjs.org/@react-native-firebase/auth/-/auth-17.0.0.tgz"
+  "version" "17.0.0"
+  dependencies:
+    "@expo/config-plugins" "^5.0.4"
+    "plist" "^3.0.5"
 
 "@react-native/assets@1.0.0":
   "integrity" "sha512-KrwSpS1tKI70wuKl68DwJZYEvXktDHdZMG0k2AXD/rJVSlB23/X2CB2cutVR0HwNMJIal9HOUOBB2rVfa6UGtQ=="
