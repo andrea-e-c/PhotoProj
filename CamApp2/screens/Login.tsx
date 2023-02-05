@@ -2,11 +2,8 @@ import React, {useState} from 'react';
 import {View, Text, StyleSheet, TextInput, Button} from 'react-native';
 import {Link} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
-import {useNavigation} from '@react-navigation/native';
 
 export default function Login() {
-  const navigation = useNavigation();
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -14,7 +11,7 @@ export default function Login() {
     auth()
       .signInWithEmailAndPassword(uname, pw)
       .then(() => {
-        navigation.navigate('Home');
+        // navigation.navigate('Home');
         console.log('User account created & signed in!');
       })
       .catch(error => {

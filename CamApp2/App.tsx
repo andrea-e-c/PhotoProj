@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import Home from './screens/Home';
@@ -8,9 +8,11 @@ import PrintPhotos from './screens/PrintPhotos';
 import Camera from './screens/Camera';
 import {StripeProvider} from '@stripe/stripe-react-native';
 import {STRIPE_PUBLISHABLE_KEY} from '@env';
+import auth from '@react-native-firebase/auth';
+import {View, Text} from 'react-native';
 
 type StackParamList = {
-  Home: undefined;
+  Home: {user: string};
   Signup: {user: string; password: string};
   Login: {user: string; password: string};
   Print: undefined;
@@ -20,19 +22,52 @@ type StackParamList = {
 const Stack = createStackNavigator<StackParamList>();
 
 export default function App(): JSX.Element {
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState();
+
+  // Handle user state changes
+  function onAuthStateChanged(u: any) {
+    setUser(u);
+    if (initializing) {
+      setInitializing(false);
+    }
+  }
+
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber; // unsubscribe on unmount
+  }, []);
+
+  if (initializing) {
+    return (
+      <View>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
   return (
     <StripeProvider
       publishableKey={STRIPE_PUBLISHABLE_KEY}
       merchantIdentifier="merchant.com.camapp">
       <NavigationContainer>
-        <Stack.Navigator
-          screenOptions={{headerShown: false}}
-          initialRouteName="Home">
-          <Stack.Screen name="Home" component={Home} />
-          <Stack.Screen name="Signup" component={Signup} />
-          <Stack.Screen name="Login" component={Login} />
-          <Stack.Screen name="Print" component={PrintPhotos} />
-          <Stack.Screen name="Camera" component={Camera} />
+        <Stack.Navigator screenOptions={{headerShown: false}}>
+          {!user ? (
+            <>
+              <Stack.Screen name="Login" component={Login} />
+              <Stack.Screen name="Signup" component={Signup} />
+            </>
+          ) : (
+            <>
+              <Stack.Screen
+                name="Home"
+                component={Home}
+                // initialParams={{user: user}}
+              />
+              <Stack.Screen name="Print" component={PrintPhotos} />
+              <Stack.Screen name="Camera" component={Camera} />
+            </>
+          )}
         </Stack.Navigator>
       </NavigationContainer>
     </StripeProvider>
