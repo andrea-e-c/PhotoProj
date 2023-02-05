@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, Text, StyleSheet, TextInput, Button} from 'react-native';
+import {View, Text, StyleSheet, TextInput, Button, Alert} from 'react-native';
 import {Link} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 
@@ -16,10 +16,12 @@ export default function Signup() {
       .catch(error => {
         if (error.code === 'auth/email-already-in-use') {
           console.log('That email address is already in use!');
+          Alert.alert('User Already Exists', 'That email is already in use.');
         }
 
         if (error.code === 'auth/invalid-email') {
           console.log('That email address is invalid!');
+          Alert.alert('Error', 'That email address is invalid.');
         }
 
         console.error(error);

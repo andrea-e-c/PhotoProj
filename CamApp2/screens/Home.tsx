@@ -6,6 +6,12 @@ import auth from '@react-native-firebase/auth';
 export default function Home() {
   const user = auth().currentUser;
 
+  const logout = () => {
+    auth()
+      .signOut()
+      .then(() => console.log('user signed out'));
+  };
+
   return (
     <View style={styles.sectionContainer}>
       {user ? <Text>Welcome {user.email}</Text> : <Text>Welcome, friend</Text>}
@@ -18,6 +24,9 @@ export default function Home() {
         <Link to={{screen: 'Print'}}>
           <Text style={styles.mainText}>Checkout</Text>
         </Link>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.startCamera} onPress={logout}>
+        <Text style={styles.mainText}>Log out</Text>
       </TouchableOpacity>
     </View>
   );

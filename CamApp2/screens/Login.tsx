@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, Text, StyleSheet, TextInput, Button} from 'react-native';
+import {View, Text, StyleSheet, TextInput, Button, Alert} from 'react-native';
 import {Link} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 
@@ -11,19 +11,29 @@ export default function Login() {
     auth()
       .signInWithEmailAndPassword(uname, pw)
       .then(() => {
-        // navigation.navigate('Home');
         console.log('User account created & signed in!');
       })
       .catch(error => {
-        if (error.code === 'auth/email-already-in-use') {
-          console.log('That email address is already in use!');
-        }
-
         if (error.code === 'auth/invalid-email') {
           console.log('That email address is invalid!');
+          Alert.alert('Error', 'That email address is invalid.');
+        }
+
+        if (error.code === 'auth/wrong-password') {
+          console.log('That password is incorrect!');
+          Alert.alert('Hmm, something went wrong', 'Incorrect password');
+        }
+
+        if (error.code === 'auth/user-not-found') {
+          console.log('User not found');
+          Alert.alert(
+            'Oops',
+            'That email address is not in use. Click the sign up button to create an account.',
+          );
         }
 
         console.error(error);
+        Alert.alert('Unknown Error', error);
       });
   };
 
