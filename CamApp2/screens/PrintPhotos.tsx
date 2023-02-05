@@ -1,8 +1,9 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {View, Text, StyleSheet, Pressable, Alert} from 'react-native';
 import {Link} from '@react-navigation/native';
 import {X_Pwinty_REST_API_Key, API_URL} from '@env';
 import {useStripe} from '@stripe/stripe-react-native';
+import {SelectList} from 'react-native-dropdown-select-list';
 
 export default function PrintPhotos() {
   const {initPaymentSheet, presentPaymentSheet} = useStripe();
@@ -15,6 +16,22 @@ export default function PrintPhotos() {
   const [items, setItems] = useState(0);
   const [shipping, setShipping] = useState(0);
   const [taxes, setTaxes] = useState(0);
+
+  // USER DETERMINED OPTIONS
+  const [shippingType, setShippingType] = useState('Budget');
+  const [photoSize, setPhotoSize] = useState('GLOBAL-PHO-4x6');
+
+  const shipData = [
+    {key: '1', value: 'Budget'},
+    {key: '2', value: 'Standard'},
+    {key: '3', value: 'Express'},
+    {key: '4', value: 'Overnight'},
+  ];
+  const photoSizeData = [
+    {key: 'GLOBAL-PHO-4x6', value: '4x6'},
+    {key: 'GLOBAL-PHO-5x7', value: '5x7'},
+    {key: 'GLOBAL-PHO-8x10', value: '8x10'},
+  ];
 
   const createOrder = async () => {
     fetch('https://api.sandbox.prodigi.com/v4.0/Orders', {
@@ -90,12 +107,12 @@ export default function PrintPhotos() {
         'Content-type': 'application/json',
       },
       body: JSON.stringify({
-        shippingMethod: 'Budget',
+        shippingMethod: shippingType,
         destinationCountryCode: 'US',
         currencyCode: 'USD',
         items: [
           {
-            sku: 'GLOBAL-PHO-4x6',
+            sku: photoSize,
             copies: 5,
             attributes: {
               finish: 'gloss',
@@ -126,11 +143,6 @@ export default function PrintPhotos() {
       .catch(error => console.error(error));
   };
 
-  useEffect(() => {
-    fetchQuote();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <View style={styles.sectionContainer}>
       <Text style={styles.mainText}>Print Photos Page Here</Text>
@@ -138,10 +150,26 @@ export default function PrintPhotos() {
       <View>
         <Text>Let's put your order together!</Text>
         <Text>Cam-App Standard 5-Photo Album</Text>
-        <Text>Shipping method: Budget</Text>
+        <Text>Shipping method</Text>
+        <SelectList
+          setSelected={(val: string) => setShippingType(val)}
+          data={shipData}
+          save="value"
+        />
         <Text>Destination country: USA</Text>
-        <Text>Photo size: 4x6</Text>
+        <Text>Photo size</Text>
+        <SelectList
+          setSelected={(val: string) => setPhotoSize(val)}
+          data={photoSizeData}
+          save="key"
+        />
         <Text>Photo finish: Glossy</Text>
+        <Pressable
+          style={styles.checkoutButton}
+          onPress={() => fetchQuote()}
+          disabled={!shippingType}>
+          <Text>Get Price</Text>
+        </Pressable>
         {items ? (
           <View>
             <Text>Album price: ${items}</Text>
