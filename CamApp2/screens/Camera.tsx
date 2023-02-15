@@ -169,6 +169,7 @@ export default class Camera extends React.Component<CameraParamList> {
           zoom={this.state.zoom}
           whiteBalance={this.state.whiteBalance}
           focusDepth={this.state.depth}
+          captureAudio={false}
           androidCameraPermissionOptions={{
             title: 'Permission to use camera',
             message: 'We need your permission to use your camera',
