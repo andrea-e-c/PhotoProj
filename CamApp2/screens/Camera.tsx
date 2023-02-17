@@ -1,5 +1,7 @@
 import React from 'react';
 import {RNCamera} from 'react-native-camera';
+import * as RNFS from 'react-native-fs';
+import makeDate from '../utils/makeDate';
 // import {useIsFocused} from '@react-navigation/native';
 import {
   View,
@@ -10,20 +12,6 @@ import {
 } from 'react-native';
 
 type CameraParamList = {
-  flashModeOrder: {
-    off: string;
-    on: string;
-    auto: string;
-    torch: string;
-  };
-  wbOrder: {
-    auto: string;
-    sunny: string;
-    cloudy: string;
-    shadow: string;
-    flourescent: string;
-    incandescent: string;
-  };
   state: {
     flash: string;
     zoom: number;
@@ -60,6 +48,23 @@ const wbOrder: {[key: string]: string} = {
   fluorescent: 'incandescent',
   incandescent: 'auto',
 };
+
+const dirPath = `${RNFS.DocumentDirectoryPath}/images`;
+
+async function moveImg(filePath: string, newPath: string) {
+  return new Promise((resolve, reject) => {
+    RNFS.mkdir(dirPath).then(() => {
+      RNFS.moveFile(filePath, newPath)
+        .then(() => {
+          resolve(true);
+        })
+        .catch(error => {
+          console.log('move file error', error);
+          reject(error);
+        });
+    });
+  });
+}
 
 export default class Camera extends React.Component<CameraParamList> {
   state: {[key: string]: any} = {
@@ -141,18 +146,32 @@ export default class Camera extends React.Component<CameraParamList> {
     });
   }
 
-  takePicture = async () => {
-    if (this.camera) {
-      const data = await this.camera.takePictureAsync();
-      console.warn('takePicture ', data);
-    } else {
-      console.warn('hmm that didnt work');
+  saveImage = async (filePath: string) => {
+    try {
+      // set new image name and filepath
+      const date = makeDate();
+      const newImageName = `${date}.jpg`;
+      const newFilepath = `${dirPath}/${newImageName}`;
+      // move and save image to new filepath
+      const imageMoved = await moveImg(filePath, newFilepath);
+      return imageMoved;
+    } catch (error) {
+      console.log('error moving image', error);
     }
   };
 
-  testRender() {
-    return <Text>Hello world</Text>;
-  }
+  takePicture = async () => {
+    if (this.camera) {
+      // take picture with options
+      const options = {quality: 0.5, base64: true};
+      const data = await this.camera.takePictureAsync(options);
+      // save picture to folder
+      const saved = await this.saveImage(data.uri);
+      return saved;
+    } else {
+      console.warn('app cannot find the camera');
+    }
+  };
 
   renderCamera() {
     return (
