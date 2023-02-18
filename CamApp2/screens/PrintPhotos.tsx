@@ -1,16 +1,26 @@
-import React, {useState} from 'react';
-import {View, Text, StyleSheet, Pressable, Alert} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  Alert,
+  TextInput,
+} from 'react-native';
 import {Link} from '@react-navigation/native';
 import {X_Pwinty_REST_API_Key, API_URL} from '@env';
 import {useStripe} from '@stripe/stripe-react-native';
 import {SelectList} from 'react-native-dropdown-select-list';
+import makePrintData from '../utils/makePrintData';
+import * as RNFS from 'react-native-fs';
+
+const dirPath = `${RNFS.DocumentDirectoryPath}/images`;
 
 export default function PrintPhotos() {
   const {initPaymentSheet, presentPaymentSheet} = useStripe();
 
   const [loading, setLoading] = useState(false);
   const [photoUrls, setPhotoUrls] = useState([]);
-  const [printData, setPrintData] = useState();
 
   // PRICING STATES
   const [items, setItems] = useState(0);
@@ -20,6 +30,29 @@ export default function PrintPhotos() {
   // USER DETERMINED OPTIONS
   const [shippingType, setShippingType] = useState('Budget');
   const [photoSize, setPhotoSize] = useState('GLOBAL-PHO-4x6');
+
+  // SHIPPING ADDRESS INFO
+  const [name, setName] = useState('');
+  const [add1, setAdd1] = useState('');
+  const [add2, setAdd2] = useState('');
+  const [city, setCity] = useState('');
+  const [st, setSt] = useState('');
+  const [zip, setZip] = useState('');
+  // const [email, setEmail] = useState('');
+
+  useEffect(() => {
+    // return new Promise((resolve, reject) => {
+    RNFS.readDir(dirPath)
+      .then(result => {
+        console.log('result', result);
+        // resolve(true);
+      })
+      .catch(error => {
+        console.log('mount error', error);
+        // reject(error);
+      });
+    // });
+  }, []);
 
   const shipData = [
     {key: '1', value: 'Budget'},
@@ -34,6 +67,17 @@ export default function PrintPhotos() {
   ];
 
   const createOrder = async () => {
+    const printData = makePrintData(
+      photoUrls,
+      name,
+      add1,
+      add2,
+      city,
+      st,
+      zip,
+      shippingType,
+      photoSize,
+    );
     fetch('https://api.sandbox.prodigi.com/v4.0/Orders', {
       method: 'POST',
       headers: {
@@ -150,6 +194,42 @@ export default function PrintPhotos() {
       <View>
         <Text>Let's put your order together!</Text>
         <Text>Cam-App Standard 5-Photo Album</Text>
+        <TextInput
+          onChangeText={setName}
+          value={name}
+          placeholder="Enter full name"
+          style={styles.textInput}
+        />
+        <TextInput
+          onChangeText={setAdd1}
+          value={add1}
+          placeholder="Address line 1"
+          style={styles.textInput}
+        />
+        <TextInput
+          onChangeText={setAdd2}
+          value={add2}
+          placeholder="Address line 2 (optional)"
+          style={styles.textInput}
+        />
+        <TextInput
+          onChangeText={setCity}
+          value={city}
+          placeholder="City"
+          style={styles.textInput}
+        />
+        <TextInput
+          onChangeText={setSt}
+          value={st}
+          placeholder="State"
+          style={styles.textInput}
+        />
+        <TextInput
+          onChangeText={setZip}
+          value={zip}
+          placeholder="Zip code"
+          style={styles.textInput}
+        />
         <Text>Shipping method</Text>
         <SelectList
           setSelected={(val: string) => setShippingType(val)}
@@ -220,6 +300,12 @@ const styles = StyleSheet.create({
     padding: 10,
     elevation: 2,
     backgroundColor: '#F194FF',
+  },
+  textInput: {
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 4,
   },
 });
 

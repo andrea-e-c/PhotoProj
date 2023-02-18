@@ -81,7 +81,24 @@ export default class Camera extends React.Component<CameraParamList> {
     depth: 0,
     type: 'back',
     whiteBalance: 'auto',
+    images: 0,
   };
+  componentDidMount() {
+    return new Promise((resolve, reject) => {
+      RNFS.readDir(dirPath)
+        .then(result => {
+          this.setState({
+            images: result.length,
+          });
+          console.log('state', this.state.images);
+          resolve(true);
+        })
+        .catch(error => {
+          console.log('mount error', error);
+          reject(error);
+        });
+    });
+  }
 
   toggleFacing() {
     this.setState({
@@ -167,11 +184,29 @@ export default class Camera extends React.Component<CameraParamList> {
       const data = await this.camera.takePictureAsync(options);
       // save picture to folder
       const saved = await this.saveImage(data.uri);
+      this.setState({
+        images: this.state.images + 1,
+      });
       return saved;
     } else {
       console.warn('app cannot find the camera');
     }
   };
+
+  checkFolder() {
+    RNFS.readDir(dirPath).then(result => {
+      console.log('GOT RESULT', result);
+    });
+  }
+
+  async clearFolder() {
+    try {
+      await RNFS.unlink(dirPath);
+      console.log('FOLDER DELETED');
+    } catch (err: any) {
+      console.log(err.message);
+    }
+  }
 
   renderCamera() {
     return (
@@ -203,6 +238,17 @@ export default class Camera extends React.Component<CameraParamList> {
               onPress={this.takePicture.bind(this)}>
               <Text>SNAP</Text>
             </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.capture}
+              onPress={this.checkFolder.bind(this)}>
+              <Text>FOLDER</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.capture}
+              onPress={this.clearFolder.bind(this)}>
+              <Text>DELETE</Text>
+            </TouchableOpacity>
+            <Text style={{color: 'white'}}>{this.state.images}</Text>
           </View>
           <View style={styles.buttonView}>
             <View style={styles.buttonRow}>
