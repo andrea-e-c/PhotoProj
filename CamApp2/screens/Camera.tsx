@@ -4,7 +4,6 @@ import * as RNFS from 'react-native-fs';
 import makeDate from '../utils/makeDate';
 import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
-// import {useIsFocused} from '@react-navigation/native';
 import {
   View,
   Text,
@@ -165,58 +164,6 @@ export default class Camera extends React.Component<CameraParamList> {
       depth,
     });
   }
-
-  // sendToFirebase = async (uri: string, u: any) => {
-  //   const blob = await new Promise((resolve, reject) => {
-  //     const xhr = new XMLHttpRequest();
-  //     xhr.onload = function () {
-  //       resolve(xhr.response);
-  //     };
-  //     xhr.onerror = function () {
-  //       reject(new TypeError('Network request failed'));
-  //     };
-  //     xhr.responseType = 'blob';
-  //     xhr.open('GET', uri, true);
-  //     xhr.send(null);
-  //   });
-
-  //   const storageRef = storage().ref(
-  //     `users/${u.uid}/image-` + String(this.state.images),
-  //   );
-  // const uploadTask = uploadBytesResumable(storageRef, blob);
-  // const uploadTask = await storageRef.putFile(blob);
-
-  // uploadTask.on('state_changed', taskSnapshot => {
-  //   console.log(
-  //     `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
-  //   );
-  // });
-
-  // uploadTask.on(
-  //   'state_changed',
-  //   snapshot => {
-  //     const progress =
-  //       (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-  //     console.log('Upload is ' + progress + '% done');
-  //     switch (snapshot.state) {
-  //       case 'paused':
-  //         console.log('Upload paused');
-  //         break;
-  //       case 'running':
-  //         console.log('Upload is running');
-  //         break;
-  //     }
-  //   },
-  //   (error: any) => {
-  //     console.error(error);
-  //   },
-  //   () => {
-  //     getDownloadURL(uploadTask.snapshot.ref).then((downloadURL: string) => {
-  //       console.log('File available at ', downloadURL);
-  //     });
-  //   },
-  // );
-  // };
 
   saveImage = async (filePath: string) => {
     try {
