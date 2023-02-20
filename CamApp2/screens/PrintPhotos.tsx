@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 import {
   View,
   Text,
@@ -13,14 +13,17 @@ import {useStripe} from '@stripe/stripe-react-native';
 import {SelectList} from 'react-native-dropdown-select-list';
 import makePrintData from '../utils/makePrintData';
 import * as RNFS from 'react-native-fs';
+import storage from '@react-native-firebase/storage';
+import auth from '@react-native-firebase/auth';
 
 const dirPath = `${RNFS.DocumentDirectoryPath}/images`;
+const user = auth().currentUser;
 
 export default function PrintPhotos() {
   const {initPaymentSheet, presentPaymentSheet} = useStripe();
 
   const [loading, setLoading] = useState(false);
-  const [photoUrls, setPhotoUrls] = useState([]);
+  const [photoUrls, setPhotoUrls] = useState<string[]>([]);
 
   // PRICING STATES
   const [items, setItems] = useState(0);
@@ -40,18 +43,19 @@ export default function PrintPhotos() {
   const [zip, setZip] = useState('');
   // const [email, setEmail] = useState('');
 
+  const fetchUrls = useCallback(async (arr: any) => {
+    arr.forEach(async (el: any) => {
+      let refUrl = `users/${user?.uid}/image-${el}`;
+      const url = await storage().ref(refUrl).getDownloadURL();
+      console.log('url', url);
+      setPhotoUrls([...photoUrls, url]);
+    });
+  }, []);
+
   useEffect(() => {
-    // return new Promise((resolve, reject) => {
-    RNFS.readDir(dirPath)
-      .then(result => {
-        console.log('result', result);
-        // resolve(true);
-      })
-      .catch(error => {
-        console.log('mount error', error);
-        // reject(error);
-      });
-    // });
+    // get download urls for images and set to state
+    const imgArr = Array.from(Array(5).keys());
+    fetchUrls(imgArr).catch(e => console.log('error:', e));
   }, []);
 
   const shipData = [
@@ -274,6 +278,7 @@ const styles = StyleSheet.create({
   sectionContainer: {
     justifyContent: 'center',
     alignItems: 'center',
+    width: '100%',
     flex: 1,
   },
   mainText: {
@@ -306,6 +311,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     marginBottom: 4,
+    marginHorizontal: 10,
   },
 });
 

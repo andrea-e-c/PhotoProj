@@ -43,7 +43,7 @@ export default function (
     photoUrls.forEach((element, i) => {
       let asset = {
         merchantReference: `Photo Album image ${i}`,
-        sku: size, // make this size
+        sku: size,
         copies: 1,
         sizing: 'fillPrintArea',
         attributes: {

@@ -2,6 +2,8 @@ import React from 'react';
 import {RNCamera} from 'react-native-camera';
 import * as RNFS from 'react-native-fs';
 import makeDate from '../utils/makeDate';
+import storage from '@react-native-firebase/storage';
+import auth from '@react-native-firebase/auth';
 // import {useIsFocused} from '@react-navigation/native';
 import {
   View,
@@ -50,6 +52,7 @@ const wbOrder: {[key: string]: string} = {
 };
 
 const dirPath = `${RNFS.DocumentDirectoryPath}/images`;
+const user = auth().currentUser;
 
 async function moveImg(filePath: string, newPath: string) {
   return new Promise((resolve, reject) => {
@@ -163,6 +166,58 @@ export default class Camera extends React.Component<CameraParamList> {
     });
   }
 
+  // sendToFirebase = async (uri: string, u: any) => {
+  //   const blob = await new Promise((resolve, reject) => {
+  //     const xhr = new XMLHttpRequest();
+  //     xhr.onload = function () {
+  //       resolve(xhr.response);
+  //     };
+  //     xhr.onerror = function () {
+  //       reject(new TypeError('Network request failed'));
+  //     };
+  //     xhr.responseType = 'blob';
+  //     xhr.open('GET', uri, true);
+  //     xhr.send(null);
+  //   });
+
+  //   const storageRef = storage().ref(
+  //     `users/${u.uid}/image-` + String(this.state.images),
+  //   );
+  // const uploadTask = uploadBytesResumable(storageRef, blob);
+  // const uploadTask = await storageRef.putFile(blob);
+
+  // uploadTask.on('state_changed', taskSnapshot => {
+  //   console.log(
+  //     `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
+  //   );
+  // });
+
+  // uploadTask.on(
+  //   'state_changed',
+  //   snapshot => {
+  //     const progress =
+  //       (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+  //     console.log('Upload is ' + progress + '% done');
+  //     switch (snapshot.state) {
+  //       case 'paused':
+  //         console.log('Upload paused');
+  //         break;
+  //       case 'running':
+  //         console.log('Upload is running');
+  //         break;
+  //     }
+  //   },
+  //   (error: any) => {
+  //     console.error(error);
+  //   },
+  //   () => {
+  //     getDownloadURL(uploadTask.snapshot.ref).then((downloadURL: string) => {
+  //       console.log('File available at ', downloadURL);
+  //     });
+  //   },
+  // );
+  // };
+
   saveImage = async (filePath: string) => {
     try {
       // set new image name and filepath
@@ -182,6 +237,11 @@ export default class Camera extends React.Component<CameraParamList> {
       // take picture with options
       const options = {quality: 0.5, base64: true};
       const data = await this.camera.takePictureAsync(options);
+      // save to external source
+      const extImg = storage().ref(
+        `users/${user?.uid}/image-` + String(this.state.images),
+      );
+      await extImg.putFile(data.uri);
       // save picture to folder
       const saved = await this.saveImage(data.uri);
       this.setState({
