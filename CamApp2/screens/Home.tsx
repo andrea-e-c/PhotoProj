@@ -14,7 +14,11 @@ export default function Home() {
 
   return (
     <View style={styles.sectionContainer}>
-      {user ? <Text>Welcome {user.email}</Text> : <Text>Welcome, friend</Text>}
+      {user ? (
+        <Text style={styles.welcome}>Welcome {user.email}</Text>
+      ) : (
+        <Text>Welcome!</Text>
+      )}
       <TouchableOpacity style={styles.startCamera}>
         <Link to={{screen: 'Camera'}}>
           <Text style={styles.mainText}>Start Camera</Text>
@@ -52,5 +56,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 40,
     margin: 10,
+  },
+  welcome: {
+    fontSize: 20,
+    color: '#14274e',
+    padding: 20,
+    fontWeight: 600,
+    textAlign: 'center',
   },
 });

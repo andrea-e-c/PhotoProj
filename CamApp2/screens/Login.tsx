@@ -42,12 +42,6 @@ export default function Login() {
       <View style={styles.Middle}>
         <Text style={styles.LoginText}>Login</Text>
       </View>
-      <View>
-        <Text style={styles.text2}>Don't have an account?</Text>
-        <Link to={{screen: 'Signup'}}>
-          <Text style={styles.signupText}>Sign up</Text>
-        </Link>
-      </View>
       {/* username input */}
       <View style={styles.buttonStyle}>
         <View style={styles.emailInput}>
@@ -80,6 +74,12 @@ export default function Login() {
           LOGIN
         </Button>
       </View>
+      <View>
+        <Text style={styles.text2}>Don't have an account?</Text>
+        <Link to={{screen: 'Signup'}} style={styles.signupText}>
+          <Text style={styles.signupText}>Sign up</Text>
+        </Link>
+      </View>
     </View>
   );
 }
@@ -102,9 +102,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     paddingTop: 5,
+    fontSize: 18,
+    marginTop: 20,
+    color: '#14274e',
+    textAlign: 'center',
   },
   signupText: {
     fontWeight: 'bold',
+    fontSize: 20,
+    color: '#14274e',
+    textAlign: 'center',
   },
   emailInput: {
     marginTop: 10,

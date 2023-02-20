@@ -59,11 +59,7 @@ export default function App(): JSX.Element {
             </>
           ) : (
             <>
-              <Stack.Screen
-                name="Home"
-                component={Home}
-                // initialParams={{user: user}}
-              />
+              <Stack.Screen name="Home" component={Home} />
               <Stack.Screen name="Print" component={PrintPhotos} />
               <Stack.Screen name="Camera" component={Camera} />
             </>
