@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useCallback} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -12,18 +12,20 @@ import {X_Pwinty_REST_API_Key, API_URL} from '@env';
 import {useStripe} from '@stripe/stripe-react-native';
 import {SelectList} from 'react-native-dropdown-select-list';
 import makePrintData from '../utils/makePrintData';
-import * as RNFS from 'react-native-fs';
+// import * as RNFS from 'react-native-fs';
 import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
 
-const dirPath = `${RNFS.DocumentDirectoryPath}/images`;
-const user = auth().currentUser;
+// at end of checkout, go back to camera, it's reset with 27 new photos.
 
-export default function PrintPhotos() {
+// const dirPath = `${RNFS.DocumentDirectoryPath}/images`;
+const user = auth().currentUser;
+const userFolder = '1'; // make this a function later.
+
+export default function PrintPhotos({navigation}: {navigation: any}) {
   const {initPaymentSheet, presentPaymentSheet} = useStripe();
 
   const [loading, setLoading] = useState(false);
-  const [photoUrls, setPhotoUrls] = useState<string[]>([]);
 
   // PRICING STATES
   const [items, setItems] = useState(0);
@@ -43,20 +45,15 @@ export default function PrintPhotos() {
   const [zip, setZip] = useState('');
   // const [email, setEmail] = useState('');
 
-  const fetchUrls = useCallback(async (arr: any) => {
-    arr.forEach(async (el: any) => {
-      let refUrl = `users/${user?.uid}/image-${el}`;
+  const fetchUrls = async (arr: any, folder: any) => {
+    let urlsArr = [];
+    for (const el of arr) {
+      let refUrl = `users/${user?.uid}/${folder}/image-${el}`;
       const url = await storage().ref(refUrl).getDownloadURL();
-      console.log('url', url);
-      setPhotoUrls([...photoUrls, url]);
-    });
-  }, []);
-
-  useEffect(() => {
-    // get download urls for images and set to state
-    const imgArr = Array.from(Array(5).keys());
-    fetchUrls(imgArr).catch(e => console.log('error:', e));
-  }, []);
+      urlsArr.push(url);
+    }
+    return urlsArr;
+  };
 
   const shipData = [
     {key: '1', value: 'Budget'},
@@ -71,6 +68,7 @@ export default function PrintPhotos() {
   ];
 
   const createOrder = async () => {
+    const photoUrls = await fetchUrls(Array.from(Array(27).keys()), userFolder);
     const printData = makePrintData(
       photoUrls,
       name,
@@ -120,13 +118,21 @@ export default function PrintPhotos() {
   };
 
   const initializePaymentSheet = async (totalAmt: string) => {
-    const {paymentIntent, ephemeralKey, customer} =
-      await fetchPaymentSheetParams(totalAmt);
+    const {
+      paymentIntent,
+      ephemeralKey,
+      customer,
+    }: {
+      paymentIntent: string;
+      ephemeralKey: string | undefined;
+      customer: string;
+    } = await fetchPaymentSheetParams(totalAmt);
     const {error} = await initPaymentSheet({
       customerId: customer,
       customerEphemeralKeySecret: ephemeralKey,
       paymentIntentClientSecret: paymentIntent,
       allowsDelayedPaymentMethods: false,
+      merchantDisplayName: '',
     });
     if (!error) {
       setLoading(true);
@@ -141,9 +147,10 @@ export default function PrintPhotos() {
       Alert.alert('Success! Your order is confirmed.');
       // send order with prodigi
       createOrder();
-      // archive album
       // create new album
+
       // navigate back to home screen
+      navigation.navigate('Home');
     }
   };
 
