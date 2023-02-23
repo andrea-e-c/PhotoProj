@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {RNCamera} from 'react-native-camera';
 import * as RNFS from 'react-native-fs';
 import makeDate from '../utils/makeDate';
@@ -10,38 +10,31 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
+  Alert,
 } from 'react-native';
 
-type CameraParamList = {
-  state: {
-    flash: string;
-    zoom: number;
-    autoFocus: string;
-    autoFocusPoint: {
-      normalized: {
-        x: number;
-        y: number;
-      };
-      drawRectPosition: {
-        x: number;
-        y: number;
-      };
-    };
-    depth: number;
-    type: any;
-    whiteBalance: string;
-  };
-  type: any;
-};
+/*
+Open camera
+Fetch user from Firebase
+List folders
+If none, make first one
+Grab newest one
+Get length
+If >=27, send to checkout page
+Set state with length
+Update dirPath to have folder number
 
-const flashModeOrder: {[key: string]: string} = {
+Making new folder will be handled in checkout success
+*/
+
+const flashModeOrder: {[key: string]: any} = {
   off: 'on',
   on: 'auto',
   auto: 'torch',
   torch: 'off',
 };
 
-const wbOrder: {[key: string]: string} = {
+const wbOrder: {[key: string]: any} = {
   auto: 'sunny',
   sunny: 'cloudy',
   cloudy: 'shadow',
@@ -68,64 +61,69 @@ async function moveImg(filePath: string, newPath: string) {
   });
 }
 
-export default class Camera extends React.Component<CameraParamList> {
-  state: {[key: string]: any} = {
-    flash: 'off',
-    zoom: 0,
-    autoFocus: 'on',
-    autoFocusPoint: {
-      normalized: {x: 0.5, y: 0.5},
-      drawRectPosition: {
-        x: Dimensions.get('window').width * 0.5 - 32,
-        y: Dimensions.get('window').height * 0.5 - 32,
-      },
+export default function Cam({navigation}): React.ReactElement {
+  const [flash, setFlash] = useState<'auto' | 'off' | 'on' | 'torch'>('off');
+  const [zoom, setZoom] = useState(0);
+  const [autoFocus, setAutoFocus] = useState<'off' | 'on'>('on');
+  const [autoFocusPoint, setAutoFocusPoint] = useState({
+    normalized: {x: 0.5, y: 0.5},
+    drawRectPosition: {
+      x: Dimensions.get('window').width * 0.5 - 32,
+      y: Dimensions.get('window').height * 0.5 - 32,
     },
-    depth: 0,
-    type: 'back',
-    whiteBalance: 'auto',
-    images: 0,
-  };
-  componentDidMount() {
-    return new Promise((resolve, reject) => {
-      RNFS.readDir(dirPath)
-        .then(result => {
-          this.setState({
-            images: result.length,
+  });
+  const [depth, setDepth] = useState(0);
+  const [type, setType] = useState<'back' | 'front'>('back');
+  const [wb, setWB] = useState<
+    'auto' | 'sunny' | 'cloudy' | 'shadow' | 'fluorescent' | 'incandescent'
+  >('auto');
+  const [images, setImages] = useState(0);
+
+  const camRef = useRef(null);
+
+  useEffect(() => {
+    const checkImgs = async () => {
+      return new Promise((resolve, reject) => {
+        RNFS.readDir(dirPath)
+          .then(result => {
+            setImages(result.length);
+            console.log('state', images);
+            resolve(true);
+          })
+          .catch(error => {
+            console.log('mount error', error);
+            reject(error);
           });
-          console.log('state', this.state.images);
-          resolve(true);
-        })
-        .catch(error => {
-          console.log('mount error', error);
-          reject(error);
-        });
-    });
-  }
+      });
+    };
+    checkImgs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  toggleFacing() {
-    this.setState({
-      type: this.state.type === 'back' ? 'front' : 'back',
-    });
-  }
+  useEffect(() => {
+    if (images >= 27) {
+      Alert.alert('time to check out!');
+      navigation.navigate('Print');
+    }
+  }, [images]);
 
-  toggleFlash() {
-    this.setState({
-      flash: flashModeOrder[this.state.flash],
-    });
-  }
+  const toggleFacing = () => {
+    setType(type === 'back' ? 'front' : 'back');
+  };
 
-  toggleWB() {
-    this.setState({
-      whiteBalance: wbOrder[this.state.whiteBalance],
-    });
-  }
+  const toggleFlash = () => {
+    setFlash(flashModeOrder[flash]);
+  };
 
-  toggleFocus() {
-    this.setState({
-      autoFocus: this.state.autoFocus === 'on' ? 'off' : 'on',
-    });
-  }
-  touchToFocus(event: any) {
+  const toggleWB = () => {
+    setWB(wbOrder[wb]);
+  };
+
+  const toggleFocus = () => {
+    setAutoFocus(autoFocus === 'on' ? 'off' : 'on');
+  };
+
+  const touchToFocus = (event: any) => {
     const {pageX, pageY} = event.nativeEvent;
     const screenWidth = Dimensions.get('window').width;
     const screenHeight = Dimensions.get('window').height;
@@ -139,35 +137,28 @@ export default class Camera extends React.Component<CameraParamList> {
       y = -(pageX / screenWidth) + 1;
     }
 
-    this.setState({
-      autoFocusPoint: {
-        normalized: {x, y},
-        drawRectPosition: {x: pageX, y: pageY},
-      },
+    setAutoFocusPoint({
+      normalized: {x: x, y: y},
+      drawRectPosition: {x: pageX, y: pageY},
     });
-  }
+  };
 
-  zoomOut() {
-    this.setState({
-      zoom: this.state.zoom - 0.1 < 0 ? 0 : this.state.zoom - 0.1,
-    });
-  }
+  //   const zoomOut = () => {
+  //     setZoom(zoom - 0.1 < 0 ? 0 : zoom - 0.1);
+  //   };
 
-  zoomIn() {
-    this.setState({
-      zoom: this.state.zoom + 0.1 > 1 ? 1 : this.state.zoom + 0.1,
-    });
-  }
+  //   const zoomIn = () => {
+  //     setZoom(zoom + 0.1 > 1 ? 1 : zoom + 0.1);
+  //   };
 
-  setFocusDepth(depth: any) {
-    this.setState({
-      depth,
-    });
-  }
+  //   const setFocusDepth = (d: number) => {
+  //     setDepth(d);
+  //   };
 
-  saveImage = async (filePath: string) => {
+  const saveImage = async (filePath: string) => {
     try {
       // set new image name and filepath
+      //new Date.valueOf
       const date = makeDate();
       const newImageName = `${date}.jpg`;
       const newFilepath = `${dirPath}/${newImageName}`;
@@ -179,34 +170,32 @@ export default class Camera extends React.Component<CameraParamList> {
     }
   };
 
-  takePicture = async () => {
-    if (this.camera) {
+  const takePicture = async () => {
+    if (camRef) {
       // take picture with options
       const options = {quality: 0.5, base64: true};
-      const data = await this.camera.takePictureAsync(options);
+      const data = await camRef?.current?.takePictureAsync(options);
       // save to external source
       const extImg = storage().ref(
-        `users/${user?.uid}/image-` + String(this.state.images),
+        `users/${user?.uid}/image-` + String(images),
       );
       await extImg.putFile(data.uri);
       // save picture to folder
-      const saved = await this.saveImage(data.uri);
-      this.setState({
-        images: this.state.images + 1,
-      });
+      const saved = await saveImage(data.uri);
+      setImages(images + 1);
       return saved;
     } else {
       console.warn('app cannot find the camera');
     }
   };
 
-  checkFolder() {
+  const checkFolder = () => {
     RNFS.readDir(dirPath).then(result => {
       console.log('GOT RESULT', result);
     });
-  }
+  };
 
-  async clearFolder() {
+  async function clearFolder() {
     try {
       await RNFS.unlink(dirPath);
       console.log('FOLDER DELETED');
@@ -215,78 +204,57 @@ export default class Camera extends React.Component<CameraParamList> {
     }
   }
 
-  renderCamera() {
-    return (
-      <>
-        <RNCamera
-          ref={ref => {
-            this.camera = ref;
-          }}
-          style={{flex: 1, justifyContent: 'space-between'}}
-          type={this.state.type}
-          flashMode={this.state.flash}
-          autoFocus={this.state.autoFocus}
-          autoFocusPointOfInterest={this.state.autoFocusPoint.normalized}
-          zoom={this.state.zoom}
-          whiteBalance={this.state.whiteBalance}
-          focusDepth={this.state.depth}
-          captureAudio={false}
-          androidCameraPermissionOptions={{
-            title: 'Permission to use camera',
-            message: 'We need your permission to use your camera',
-            buttonPositive: 'Ok',
-            buttonNegative: 'Cancel',
-          }}
-        />
-        <View>
-          <View style={styles.camButton}>
-            <TouchableOpacity
-              style={styles.capture}
-              onPress={this.takePicture.bind(this)}>
-              <Text>SNAP</Text>
+  return (
+    <View style={styles.container}>
+      <RNCamera
+        ref={camRef}
+        style={{flex: 1, justifyContent: 'space-between'}}
+        type={type}
+        flashMode={flash}
+        autoFocus={autoFocus}
+        autoFocusPointOfInterest={autoFocusPoint.normalized}
+        zoom={zoom}
+        whiteBalance={wb}
+        focusDepth={depth}
+        captureAudio={false}
+        androidCameraPermissionOptions={{
+          title: 'Permission to use camera',
+          message: 'We need your permission to use your camera',
+          buttonPositive: 'Ok',
+          buttonNegative: 'Cancel',
+        }}
+      />
+      <View>
+        <View style={styles.countdown}>
+          <Text style={styles.imgCountdown}>{27 - images}</Text>
+        </View>
+        <View style={styles.camButton}>
+          <TouchableOpacity style={styles.capture} onPress={takePicture}>
+            <Text>SNAP</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.capture} onPress={checkFolder}>
+            <Text>FOLDER</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.capture} onPress={clearFolder}>
+            <Text>DELETE</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.buttonView}>
+          <View style={styles.buttonRow}>
+            <TouchableOpacity style={styles.flipButton} onPress={toggleFacing}>
+              <Text style={styles.flipText}> FLIP </Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.capture}
-              onPress={this.checkFolder.bind(this)}>
-              <Text>FOLDER</Text>
+            <TouchableOpacity style={styles.flipButton} onPress={toggleFlash}>
+              <Text style={styles.flipText}> FLASH: {flash} </Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.capture}
-              onPress={this.clearFolder.bind(this)}>
-              <Text>DELETE</Text>
+            <TouchableOpacity style={styles.flipButton} onPress={toggleWB}>
+              <Text style={styles.flipText}> WB: {wb} </Text>
             </TouchableOpacity>
-            <Text style={{color: 'white'}}>{this.state.images}</Text>
-          </View>
-          <View style={styles.buttonView}>
-            <View style={styles.buttonRow}>
-              <TouchableOpacity
-                style={styles.flipButton}
-                onPress={this.toggleFacing.bind(this)}>
-                <Text style={styles.flipText}> FLIP </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.flipButton}
-                onPress={this.toggleFlash.bind(this)}>
-                <Text style={styles.flipText}> FLASH: {this.state.flash} </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.flipButton}
-                onPress={this.toggleWB.bind(this)}>
-                <Text style={styles.flipText}>
-                  {' '}
-                  WB: {this.state.whiteBalance}{' '}
-                </Text>
-              </TouchableOpacity>
-            </View>
           </View>
         </View>
-      </>
-    );
-  }
-
-  render() {
-    return <View style={styles.container}>{this.renderCamera()}</View>;
-  }
+      </View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -337,5 +305,13 @@ const styles = StyleSheet.create({
   flipText: {
     color: 'white',
     fontSize: 15,
+  },
+  countdown: {
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+  },
+  imgCountdown: {
+    color: 'white',
+    fontSize: 36,
   },
 });

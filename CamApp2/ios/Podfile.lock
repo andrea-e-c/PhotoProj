@@ -424,6 +424,8 @@ PODS:
   - RNScreens (3.19.0):
     - React-Core
     - React-RCTImage
+  - RNVectorIcons (9.2.0):
+    - React-Core
   - Stripe (23.3.4):
     - StripeApplePay (= 23.3.4)
     - StripeCore (= 23.3.4)
@@ -460,6 +462,10 @@ PODS:
     - StripeUICore (= 23.3.4)
   - StripeUICore (23.3.4):
     - StripeCore (= 23.3.4)
+  - VisionCamera (2.15.4):
+    - React
+    - React-callinvoker
+    - React-Core
   - Yoga (1.14.0)
 
 DEPENDENCIES:
@@ -509,7 +515,9 @@ DEPENDENCIES:
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
+  - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - "stripe-react-native (from `../node_modules/@stripe/stripe-react-native`)"
+  - VisionCamera (from `../node_modules/react-native-vision-camera`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -625,8 +633,12 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
     :path: "../node_modules/react-native-screens"
+  RNVectorIcons:
+    :path: "../node_modules/react-native-vector-icons"
   stripe-react-native:
     :path: "../node_modules/@stripe/stripe-react-native"
+  VisionCamera:
+    :path: "../node_modules/react-native-vision-camera"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -688,6 +700,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: 071d7a9ad81e8b83fe7663b303d132406a7d8f39
   RNReanimated: cc5e3aa479cb9170bcccf8204291a6950a3be128
   RNScreens: ea4cd3a853063cda19a4e3c28d2e52180c80f4eb
+  RNVectorIcons: fcc2f6cb32f5735b586e66d14103a74ce6ad61f8
   Stripe: 7393b16fe555d4a68e6555044e7b57eff11ae547
   stripe-react-native: f8944c62d8d96287f35aa5e527adacc30d2f8560
   StripeApplePay: 174b09c0211134417e340c68af199a3dd34f3cd6
@@ -697,6 +710,7 @@ SPEC CHECKSUMS:
   StripePaymentSheet: 722ea7bea092c243d771122fe3572a9c84512704
   StripePaymentsUI: fd08081c4be73c16322dc76a1878140520a9df2e
   StripeUICore: ed68cbd5ad0626e0760e772f8c82d96cae9b829b
+  VisionCamera: c6356b309f7b8e185b7be2e703ec67bb35acf345
   Yoga: 921eb014669cf9c718ada68b08d362517d564e0c
 
 PODFILE CHECKSUM: 182834412106efcda4468c493fee59f53ecd0199

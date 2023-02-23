@@ -5,11 +5,13 @@ import Home from './screens/Home';
 import Signup from './screens/Signup';
 import Login from './screens/Login';
 import PrintPhotos from './screens/PrintPhotos';
-import Camera from './screens/Camera';
+import Cam from './screens/Camera';
 import {StripeProvider} from '@stripe/stripe-react-native';
 import {STRIPE_PUBLISHABLE_KEY} from '@env';
 import auth from '@react-native-firebase/auth';
 import {View, Text} from 'react-native';
+
+// import {Camera, CameraPermissionStatus} from 'react-native-vision-camera';
 
 type StackParamList = {
   Home: {user: string};
@@ -24,6 +26,10 @@ const Stack = createStackNavigator<StackParamList>();
 export default function App(): JSX.Element {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
+  // const [cameraPermission, setCameraPermission] =
+  //   useState<CameraPermissionStatus>();
+  // const [microphonePermission, setMicrophonePermission] =
+  //   useState<CameraPermissionStatus>();
 
   // Handle user state changes
   function onAuthStateChanged(u: any) {
@@ -36,7 +42,13 @@ export default function App(): JSX.Element {
   useEffect(() => {
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
     return subscriber; // unsubscribe on unmount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // useEffect(() => {
+  //   Camera.getCameraPermissionStatus().then(setCameraPermission);
+  //   Camera.getMicrophonePermissionStatus().then(setMicrophonePermission);
+  // }, []);
 
   if (initializing) {
     return (
@@ -45,6 +57,11 @@ export default function App(): JSX.Element {
       </View>
     );
   }
+
+  // if (cameraPermission == null || microphonePermission == null) {
+  //   // still loading
+  //   return null;
+  // }
 
   return (
     <StripeProvider
@@ -61,7 +78,7 @@ export default function App(): JSX.Element {
             <>
               <Stack.Screen name="Home" component={Home} />
               <Stack.Screen name="Print" component={PrintPhotos} />
-              <Stack.Screen name="Camera" component={Camera} />
+              <Stack.Screen name="Camera" component={Cam} />
             </>
           )}
         </Stack.Navigator>
