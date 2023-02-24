@@ -75,6 +75,11 @@ export default function Login() {
         </Button>
       </View>
       <View>
+        <Link to={{screen: 'Reset'}} style={styles.signupText}>
+          <Text style={styles.signupText}>Forgot password?</Text>
+        </Link>
+      </View>
+      <View>
         <Text style={styles.text2}>Don't have an account?</Text>
         <Link to={{screen: 'Signup'}} style={styles.signupText}>
           <Text style={styles.signupText}>Sign up</Text>
