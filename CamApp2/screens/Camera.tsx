@@ -12,18 +12,9 @@ import {
   Dimensions,
   Alert,
 } from 'react-native';
+import {getCurrentFolder, getFolderLength} from '../utils/getCurrentFolder';
 
 /*
-Open camera
-Fetch user from Firebase
-List folders
-If none, make first one
-Grab newest one
-Get length
-If >=27, send to checkout page
-Set state with length
-Update dirPath to have folder number
-
 Making new folder will be handled in checkout success
 */
 
@@ -43,8 +34,9 @@ const wbOrder: {[key: string]: any} = {
   incandescent: 'auto',
 };
 
-const dirPath = `${RNFS.DocumentDirectoryPath}/images`;
 const user = auth().currentUser;
+const imgFolderRef = storage().ref(`users/${user?.uid}/images/`);
+const dirPath = `${RNFS.DocumentDirectoryPath}/images`;
 
 async function moveImg(filePath: string, newPath: string) {
   return new Promise((resolve, reject) => {
@@ -78,26 +70,25 @@ export default function Cam({navigation}): React.ReactElement {
     'auto' | 'sunny' | 'cloudy' | 'shadow' | 'fluorescent' | 'incandescent'
   >('auto');
   const [images, setImages] = useState(0);
+  const [folderName, setFolderName] = useState('');
 
   const camRef = useRef(null);
 
   useEffect(() => {
-    const checkImgs = async () => {
-      return new Promise((resolve, reject) => {
-        RNFS.readDir(dirPath)
-          .then(result => {
-            setImages(result.length);
-            console.log('state', images);
-            resolve(true);
-          })
-          .catch(error => {
-            console.log('mount error', error);
-            reject(error);
-          });
-      });
+    const getStuff = async () => {
+      const folders = await getCurrentFolder(imgFolderRef);
+      if (folders.length === 0) {
+        setFolderName(makeDate());
+        setImages(0);
+      } else {
+        const folder = folders.pop();
+        const name = folder.split('/');
+        setFolderName(name.pop());
+        const imgList = await getFolderLength(storage().ref(folder));
+        setImages(imgList.length);
+      }
     };
-    checkImgs();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    getStuff();
   }, []);
 
   useEffect(() => {
@@ -105,6 +96,7 @@ export default function Cam({navigation}): React.ReactElement {
       Alert.alert('time to check out!');
       navigation.navigate('Print');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [images]);
 
   const toggleFacing = () => {
@@ -177,7 +169,7 @@ export default function Cam({navigation}): React.ReactElement {
       const data = await camRef?.current?.takePictureAsync(options);
       // save to external source
       const extImg = storage().ref(
-        `users/${user?.uid}/image-` + String(images),
+        `users/${user?.uid}/images/${folderName}/image-` + String(images),
       );
       await extImg.putFile(data.uri);
       // save picture to folder

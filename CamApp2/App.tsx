@@ -4,6 +4,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import Home from './screens/Home';
 import Signup from './screens/Signup';
 import Login from './screens/Login';
+import ResetPassword from './screens/ResetPassword';
 import PrintPhotos from './screens/PrintPhotos';
 import Cam from './screens/Camera';
 import {StripeProvider} from '@stripe/stripe-react-native';
@@ -73,6 +74,7 @@ export default function App(): JSX.Element {
             <>
               <Stack.Screen name="Login" component={Login} />
               <Stack.Screen name="Signup" component={Signup} />
+              <Stack.Screen name="Reset" component={ResetPassword} />
             </>
           ) : (
             <>
