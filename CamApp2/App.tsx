@@ -11,7 +11,9 @@ import {StripeProvider} from '@stripe/stripe-react-native';
 import {STRIPE_PUBLISHABLE_KEY} from '@env';
 import auth from '@react-native-firebase/auth';
 import {View, Text} from 'react-native';
-
+import {store, persistor} from './redux/store';
+import {Provider} from 'react-redux';
+import {PersistGate} from 'redux-persist/integration/react';
 // import {Camera, CameraPermissionStatus} from 'react-native-vision-camera';
 
 type StackParamList = {
@@ -65,26 +67,30 @@ export default function App(): JSX.Element {
   // }
 
   return (
-    <StripeProvider
-      publishableKey={STRIPE_PUBLISHABLE_KEY}
-      merchantIdentifier="merchant.com.camapp">
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{headerShown: false}}>
-          {!user ? (
-            <>
-              <Stack.Screen name="Login" component={Login} />
-              <Stack.Screen name="Signup" component={Signup} />
-              <Stack.Screen name="Reset" component={ResetPassword} />
-            </>
-          ) : (
-            <>
-              <Stack.Screen name="Home" component={Home} />
-              <Stack.Screen name="Print" component={PrintPhotos} />
-              <Stack.Screen name="Camera" component={Cam} />
-            </>
-          )}
-        </Stack.Navigator>
-      </NavigationContainer>
-    </StripeProvider>
+    <Provider store={store}>
+      <PersistGate loading={<Text>Loading...</Text>} persistor={persistor}>
+        <StripeProvider
+          publishableKey={STRIPE_PUBLISHABLE_KEY}
+          merchantIdentifier="merchant.com.camapp">
+          <NavigationContainer>
+            <Stack.Navigator screenOptions={{headerShown: false}}>
+              {!user ? (
+                <>
+                  <Stack.Screen name="Login" component={Login} />
+                  <Stack.Screen name="Signup" component={Signup} />
+                  <Stack.Screen name="Reset" component={ResetPassword} />
+                </>
+              ) : (
+                <>
+                  <Stack.Screen name="Home" component={Home} />
+                  <Stack.Screen name="Print" component={PrintPhotos} />
+                  <Stack.Screen name="Camera" component={Cam} />
+                </>
+              )}
+            </Stack.Navigator>
+          </NavigationContainer>
+        </StripeProvider>
+      </PersistGate>
+    </Provider>
   );
 }

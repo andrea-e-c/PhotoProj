@@ -15,6 +15,8 @@ import makePrintData from '../utils/makePrintData';
 // import * as RNFS from 'react-native-fs';
 import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
+import {addPaymentStatus} from '../redux/action';
+import {useDispatch} from 'react-redux';
 
 // at end of checkout, go back to camera, it's reset with 27 new photos.
 
@@ -24,6 +26,7 @@ const userFolder = '1'; // make this a function later.
 
 export default function PrintPhotos({navigation}: {navigation: any}) {
   const {initPaymentSheet, presentPaymentSheet} = useStripe();
+  const dispatch = useDispatch();
 
   const [loading, setLoading] = useState(false);
 
@@ -66,6 +69,10 @@ export default function PrintPhotos({navigation}: {navigation: any}) {
     {key: 'GLOBAL-PHO-5x7', value: '5x7'},
     {key: 'GLOBAL-PHO-8x10', value: '8x10'},
   ];
+
+  const markAsPaid = () => {
+    dispatch(addPaymentStatus(true));
+  };
 
   const createOrder = async () => {
     const photoUrls = await fetchUrls(Array.from(Array(27).keys()), userFolder);
@@ -148,7 +155,7 @@ export default function PrintPhotos({navigation}: {navigation: any}) {
       // send order with prodigi
       createOrder();
       // create new album
-
+      markAsPaid();
       // navigate back to home screen
       navigation.navigate('Home');
     }
@@ -200,11 +207,11 @@ export default function PrintPhotos({navigation}: {navigation: any}) {
 
   return (
     <View style={styles.sectionContainer}>
-      <Text style={styles.mainText}>Print Photos Page Here</Text>
-      <Link to={{screen: 'Home'}}>Go home</Link>
+      <Link to={{screen: 'Home'}} style={styles.mainText}>
+        Go home
+      </Link>
       <View>
         <Text>Let's put your order together!</Text>
-        <Text>Cam-App Standard 5-Photo Album</Text>
         <TextInput
           onChangeText={setName}
           value={name}
@@ -247,7 +254,6 @@ export default function PrintPhotos({navigation}: {navigation: any}) {
           data={shipData}
           save="value"
         />
-        <Text>Destination country: USA</Text>
         <Text>Photo size</Text>
         <SelectList
           setSelected={(val: string) => setPhotoSize(val)}
@@ -269,7 +275,7 @@ export default function PrintPhotos({navigation}: {navigation: any}) {
             <Text>Total: ${(taxes + taxes * 0.1).toFixed(2)}</Text>
           </View>
         ) : (
-          <Text>Loading price...</Text>
+          <Text>Price awaiting shipping info...</Text>
         )}
       </View>
       <Pressable

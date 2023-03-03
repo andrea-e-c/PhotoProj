@@ -9,7 +9,6 @@ export const getCurrentFolder = async (reference: any, pageToken?: any) => {
     if (result.nextPageToken) {
       return getCurrentFolder(reference, result.nextPageToken);
     }
-    console.log('help', folderArr);
     return folderArr;
   });
 };
