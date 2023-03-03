@@ -13,10 +13,8 @@ import {
   Alert,
 } from 'react-native';
 import {getCurrentFolder, getFolderLength} from '../utils/getCurrentFolder';
-
-/*
-Making new folder will be handled in checkout success
-*/
+import {useSelector, useDispatch} from 'react-redux';
+import {addPaymentStatus} from '../redux/action';
 
 const flashModeOrder: {[key: string]: any} = {
   off: 'on',
@@ -37,7 +35,6 @@ const wbOrder: {[key: string]: any} = {
 const user = auth().currentUser;
 const imgFolderRef = storage().ref(`users/${user?.uid}/images/`);
 const dirPath = `${RNFS.DocumentDirectoryPath}/images`;
-
 async function moveImg(filePath: string, newPath: string) {
   return new Promise((resolve, reject) => {
     RNFS.mkdir(dirPath).then(() => {
@@ -53,7 +50,11 @@ async function moveImg(filePath: string, newPath: string) {
   });
 }
 
-export default function Cam({navigation}): React.ReactElement {
+export default function Cam({
+  navigation,
+}: {
+  navigation: any;
+}): React.ReactElement {
   const [flash, setFlash] = useState<'auto' | 'off' | 'on' | 'torch'>('off');
   const [zoom, setZoom] = useState(0);
   const [autoFocus, setAutoFocus] = useState<'off' | 'on'>('on');
@@ -73,6 +74,8 @@ export default function Cam({navigation}): React.ReactElement {
   const [folderName, setFolderName] = useState('');
 
   const camRef = useRef(null);
+  const isPaid = useSelector((state: any) => state.paid);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const getStuff = async () => {
@@ -83,9 +86,24 @@ export default function Cam({navigation}): React.ReactElement {
       } else {
         const folder = folders.pop();
         const name = folder.split('/');
-        setFolderName(name.pop());
+        const tempName = name.pop();
         const imgList = await getFolderLength(storage().ref(folder));
-        setImages(imgList.length);
+
+        if (imgList.length === 27) {
+          if (isPaid) {
+            // Create a new folder
+            setFolderName(makeDate());
+            setImages(0);
+          } else {
+            // refer to the old folder
+            setFolderName(tempName);
+            setImages(imgList.length);
+          }
+        } else {
+          // go back to where you left off;
+          setFolderName(tempName);
+          setImages(imgList.length);
+        }
       }
     };
     getStuff();
@@ -175,6 +193,9 @@ export default function Cam({navigation}): React.ReactElement {
       // save picture to folder
       const saved = await saveImage(data.uri);
       setImages(images + 1);
+      if (isPaid) {
+        dispatch(addPaymentStatus(false));
+      }
       return saved;
     } else {
       console.warn('app cannot find the camera');
@@ -224,12 +245,12 @@ export default function Cam({navigation}): React.ReactElement {
           <TouchableOpacity style={styles.capture} onPress={takePicture}>
             <Text>SNAP</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.capture} onPress={checkFolder}>
+          {/* <TouchableOpacity style={styles.capture} onPress={checkFolder}>
             <Text>FOLDER</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.capture} onPress={clearFolder}>
             <Text>DELETE</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         <View style={styles.buttonView}>
           <View style={styles.buttonRow}>
