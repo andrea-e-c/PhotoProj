@@ -15,6 +15,7 @@ import {
 import {getCurrentFolder, getFolderLength} from '../utils/getCurrentFolder';
 import {useSelector, useDispatch} from 'react-redux';
 import {addPaymentStatus} from '../redux/action';
+import {Link} from '@react-navigation/native';
 
 const flashModeOrder: {[key: string]: any} = {
   off: 'on',
@@ -238,12 +239,17 @@ export default function Cam({
         }}
       />
       <View>
-        <View style={styles.countdown}>
-          <Text style={styles.imgCountdown}>{27 - images}</Text>
-        </View>
         <View style={styles.camButton}>
+          <View style={styles.countdown}>
+            <Text style={styles.imgCountdown}>{27 - images}</Text>
+          </View>
           <TouchableOpacity style={styles.capture} onPress={takePicture}>
             <Text>SNAP</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.capture}>
+            <Link to={{screen: 'Home'}}>
+              <Text>Home</Text>
+            </Link>
           </TouchableOpacity>
           {/* <TouchableOpacity style={styles.capture} onPress={checkFolder}>
             <Text>FOLDER</Text>

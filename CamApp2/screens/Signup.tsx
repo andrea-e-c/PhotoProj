@@ -68,7 +68,7 @@ export default function Signup() {
       <View>
         <Text style={styles.text2}>Already have an account?</Text>
         <Link to={{screen: 'Login'}} style={styles.signupText}>
-          <Text>Login Screen</Text>
+          <Text>Login</Text>
         </Link>
       </View>
     </View>
