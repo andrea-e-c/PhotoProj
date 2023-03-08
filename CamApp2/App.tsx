@@ -6,7 +6,8 @@ import Signup from './screens/Signup';
 import Login from './screens/Login';
 import ResetPassword from './screens/ResetPassword';
 import PrintPhotos from './screens/PrintPhotos';
-import Cam from './screens/Camera';
+// import Cam from './screens/Camera';
+import Camera2 from './screens/newCamera';
 import {StripeProvider} from '@stripe/stripe-react-native';
 import {STRIPE_PUBLISHABLE_KEY} from '@env';
 import auth from '@react-native-firebase/auth';
@@ -14,7 +15,7 @@ import {View, Text} from 'react-native';
 import {store, persistor} from './redux/store';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
-// import {Camera, CameraPermissionStatus} from 'react-native-vision-camera';
+import {Camera, CameraPermissionStatus} from 'react-native-vision-camera';
 
 type StackParamList = {
   Home: {user: string};
@@ -29,10 +30,10 @@ const Stack = createStackNavigator<StackParamList>();
 export default function App(): JSX.Element {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
-  // const [cameraPermission, setCameraPermission] =
-  //   useState<CameraPermissionStatus>();
-  // const [microphonePermission, setMicrophonePermission] =
-  //   useState<CameraPermissionStatus>();
+  const [cameraPermission, setCameraPermission] =
+    useState<CameraPermissionStatus>();
+  const [microphonePermission, setMicrophonePermission] =
+    useState<CameraPermissionStatus>();
 
   // Handle user state changes
   function onAuthStateChanged(u: any) {
@@ -48,10 +49,10 @@ export default function App(): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // useEffect(() => {
-  //   Camera.getCameraPermissionStatus().then(setCameraPermission);
-  //   Camera.getMicrophonePermissionStatus().then(setMicrophonePermission);
-  // }, []);
+  useEffect(() => {
+    Camera.getCameraPermissionStatus().then(setCameraPermission);
+    Camera.getMicrophonePermissionStatus().then(setMicrophonePermission);
+  }, []);
 
   if (initializing) {
     return (
@@ -61,10 +62,10 @@ export default function App(): JSX.Element {
     );
   }
 
-  // if (cameraPermission == null || microphonePermission == null) {
-  //   // still loading
-  //   return null;
-  // }
+  if (cameraPermission == null || microphonePermission == null) {
+    // still loading
+    return null;
+  }
 
   return (
     <Provider store={store}>
@@ -84,7 +85,7 @@ export default function App(): JSX.Element {
                 <>
                   <Stack.Screen name="Home" component={Home} />
                   <Stack.Screen name="Print" component={PrintPhotos} />
-                  <Stack.Screen name="Camera" component={Cam} />
+                  <Stack.Screen name="Camera" component={Camera2} />
                 </>
               )}
             </Stack.Navigator>
