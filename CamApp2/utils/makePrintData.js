@@ -16,7 +16,6 @@ export default function (
       name: 'First Last',
       address: {
         line1: '',
-        line2: '',
         postalOrZipCode: '',
         countryCode: 'US',
         townOrCity: '',
@@ -33,12 +32,14 @@ export default function (
   }
   data.recipient.address = {
     line1: add1,
-    line2: add2,
     postalOrZipCode: zip,
     countryCode: 'US',
     townOrCity: city,
     stateOrCounty: st,
   };
+  if (add2 !== '') {
+    data.recipient.address.line2 = add2;
+  }
   if (photoUrls?.length) {
     photoUrls.forEach((element, i) => {
       let asset = {
