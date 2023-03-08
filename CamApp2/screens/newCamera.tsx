@@ -209,7 +209,7 @@ export default function Camera2({
   }, []);
 
   useEffect(() => {
-    if (images >= 27) {
+    if (images >= 5) {
       Alert.alert('time to check out!');
       navigation.navigate('Print');
     }
@@ -270,7 +270,7 @@ export default function Camera2({
     console.log('snapped');
     if (camera) {
       // take picture with options
-      const data = await camera?.current?.takeSnapshot(takePhotoOptions);
+      const data = await camera?.current?.takePhoto(takePhotoOptions);
       // save to external source
       if (data) {
         const extImg = storage().ref(

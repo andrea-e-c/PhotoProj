@@ -17,12 +17,20 @@ import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
 import {addPaymentStatus} from '../redux/action';
 import {useDispatch} from 'react-redux';
+import {getCurrentFolder} from '../utils/getCurrentFolder';
 
 // at end of checkout, go back to camera, it's reset with 27 new photos.
 
 // const dirPath = `${RNFS.DocumentDirectoryPath}/images`;
 const user = auth().currentUser;
-const userFolder = '1'; // make this a function later.
+const imgFolderRef = storage().ref(`users/${user?.uid}/images/`);
+const getUserFolder = async () => {
+  const userFolders = await getCurrentFolder(imgFolderRef);
+  const folder = userFolders.pop();
+  const name = folder.split('/');
+  const tempName = name.pop();
+  return tempName;
+};
 
 export default function PrintPhotos({navigation}: {navigation: any}) {
   const {initPaymentSheet, presentPaymentSheet} = useStripe();
@@ -51,10 +59,12 @@ export default function PrintPhotos({navigation}: {navigation: any}) {
   const fetchUrls = async (arr: any, folder: any) => {
     let urlsArr = [];
     for (const el of arr) {
-      let refUrl = `users/${user?.uid}/${folder}/image-${el}`;
+      let refUrl = `users/${user?.uid}/images/${folder}/image-${el}`;
+      console.log('refUrl', refUrl);
       const url = await storage().ref(refUrl).getDownloadURL();
       urlsArr.push(url);
     }
+    console.log('urls array', urlsArr);
     return urlsArr;
   };
 
@@ -75,7 +85,8 @@ export default function PrintPhotos({navigation}: {navigation: any}) {
   };
 
   const createOrder = async () => {
-    const photoUrls = await fetchUrls(Array.from(Array(27).keys()), userFolder);
+    const userFolder = await getUserFolder();
+    const photoUrls = await fetchUrls(Array.from(Array(4).keys()), userFolder);
     const printData = makePrintData(
       photoUrls,
       name,
@@ -87,6 +98,7 @@ export default function PrintPhotos({navigation}: {navigation: any}) {
       shippingType,
       photoSize,
     );
+    console.log('print data', JSON.stringify(printData));
     fetch('https://api.sandbox.prodigi.com/v4.0/Orders', {
       method: 'POST',
       headers: {
@@ -99,7 +111,7 @@ export default function PrintPhotos({navigation}: {navigation: any}) {
         if (res.ok) {
           console.log('order request successful');
         } else {
-          console.log('error', res);
+          console.log('error', res.statusText);
         }
         return res;
       })
