@@ -66,13 +66,13 @@ export default function Login() {
         </View>
       </View>
       <View style={styles.buttonStyle}>
-        <Button
-          style={styles.buttonDeisgn}
-          disabled={!email && !password}
-          onPress={() => loginUser(email, password)}
-          title="Login">
-          LOGIN
-        </Button>
+        <View style={styles.buttonDeisgn}>
+          <Button
+            disabled={!email && !password}
+            onPress={() => loginUser(email, password)}
+            title="Login"
+          />
+        </View>
       </View>
       <View>
         <Link to={{screen: 'Reset'}} style={styles.signupText}>
@@ -126,6 +126,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
     marginLeft: 15,
     marginRight: 15,
+    justifyContent: 'center',
   },
   buttonStyleX: {
     marginTop: 12,
@@ -133,7 +134,8 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   buttonDeisgn: {
-    backgroundColor: '#026efd',
+    backgroundColor: '#14274e',
+    borderRadius: 10,
   },
   lineStyle: {
     flexDirection: 'row',

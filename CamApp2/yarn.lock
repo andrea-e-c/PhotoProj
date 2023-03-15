@@ -6198,10 +6198,10 @@
     "lodash" "^4.17.21"
     "prop-types" "^15.7.2"
 
-"react-native-gradle-plugin@^0.71.13":
-  "integrity" "sha512-C66LNZAXbU0YDRkWx8d/8kjesdu7fsUAc/3QPJNftSXKEvEtnFZK2aH/rIgu1s5dbTcE0fjhdVPNJMRIfKo61w=="
-  "resolved" "https://registry.npmjs.org/react-native-gradle-plugin/-/react-native-gradle-plugin-0.71.13.tgz"
-  "version" "0.71.13"
+"react-native-gradle-plugin@^0.71.13", "react-native-gradle-plugin@^0.71.16":
+  "integrity" "sha512-H2BjG2zk7B7Wii9sXvd9qhCVRQYDAHSWdMw9tscmZBqSP62DkIWEQSk4/B2GhQ4aK9ydVXgtqR6tBeg3yy8TSA=="
+  "resolved" "https://registry.npmjs.org/react-native-gradle-plugin/-/react-native-gradle-plugin-0.71.16.tgz"
+  "version" "0.71.16"
 
 "react-native-pressable-opacity@^1.0.10":
   "integrity" "sha512-Py9YH9TlS3Lv1so5JCj6bgiqkeYYGupF4ZImlpoyhhId/t/RiSqR68LlASOHgdctqQuqVJObQiFfzX8oZI9+6w=="
