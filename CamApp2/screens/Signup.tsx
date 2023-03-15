@@ -57,13 +57,13 @@ export default function Signup() {
         </View>
       </View>
       <View style={styles.buttonStyle}>
-        <Button
-          style={styles.buttonDeisgn}
-          disabled={!email && !password}
-          onPress={() => loginUser(email, password)}
-          title="Sign Up">
-          SIGN UP
-        </Button>
+        <View style={styles.buttonDeisgn}>
+          <Button
+            disabled={!email && !password}
+            onPress={() => loginUser(email, password)}
+            title="Sign Up"
+          />
+        </View>
       </View>
       <View>
         <Text style={styles.text2}>Already have an account?</Text>
@@ -119,7 +119,8 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   buttonDeisgn: {
-    backgroundColor: '#026efd',
+    backgroundColor: '#14274e',
+    borderRadius: 10,
   },
   lineStyle: {
     flexDirection: 'row',

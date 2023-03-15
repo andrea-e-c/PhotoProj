@@ -28,13 +28,6 @@ import {
 import {useIsForeground} from '../utils/useIsForeground';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 import {PressableOpacity} from 'react-native-pressable-opacity';
-// import {
-//   ColorMatrix,
-//   concatColorMatrices,
-//   invert,
-//   contrast,
-//   saturate,
-// } from 'react-native-color-matrix-image-filters';
 import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
 import * as RNFS from 'react-native-fs';
@@ -209,7 +202,7 @@ export default function Camera2({
   }, []);
 
   useEffect(() => {
-    if (images >= 5) {
+    if (images >= 27) {
       Alert.alert('time to check out!');
       navigation.navigate('Print');
     }
@@ -330,7 +323,7 @@ export default function Camera2({
         </PinchGestureHandler>
       )}
       <Text style={styles.imgCountdown}>{27 - images}</Text>
-      <View style={styles.captureButton}>
+      <View style={styles.captureButtonPortrait}>
         <TouchableOpacity onPress={takePicture} style={styles.button}>
           <Text>SNAP</Text>
         </TouchableOpacity>
@@ -345,18 +338,18 @@ export default function Camera2({
             <IonIcon name="camera-reverse" color="white" size={24} />
           </PressableOpacity>
         )}
-        {/* {supportsFlash && ( */}
-        <PressableOpacity
-          style={styles.button}
-          onPress={onFlashPressed}
-          disabledOpacity={0.4}>
-          <IonIcon
-            name={flash === 'on' ? 'flash' : 'flash-off'}
-            color="white"
-            size={24}
-          />
-        </PressableOpacity>
-        {/* )} */}
+        {supportsFlash && (
+          <PressableOpacity
+            style={styles.button}
+            onPress={onFlashPressed}
+            disabledOpacity={0.4}>
+            <IonIcon
+              name={flash === 'on' ? 'flash' : 'flash-off'}
+              color="white"
+              size={24}
+            />
+          </PressableOpacity>
+        )}
       </View>
     </View>
   );
@@ -367,10 +360,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'red',
   },
-  captureButton: {
+  captureButtonPortrait: {
     position: 'absolute',
     alignSelf: 'center',
     bottom: 20,
+  },
+  captureButtonHorizontal: {
+    position: 'absolute',
+    justifySelf: 'center',
+    right: 20,
   },
   button: {
     marginBottom: 15,

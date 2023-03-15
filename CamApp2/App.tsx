@@ -6,7 +6,6 @@ import Signup from './screens/Signup';
 import Login from './screens/Login';
 import ResetPassword from './screens/ResetPassword';
 import PrintPhotos from './screens/PrintPhotos';
-// import Cam from './screens/Camera';
 import Camera2 from './screens/newCamera';
 import {StripeProvider} from '@stripe/stripe-react-native';
 import {STRIPE_PUBLISHABLE_KEY} from '@env';
@@ -17,15 +16,16 @@ import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import {Camera, CameraPermissionStatus} from 'react-native-vision-camera';
 
-type StackParamList = {
-  Home: {user: string};
-  Signup: {user: string; password: string};
-  Login: {user: string; password: string};
-  Print: undefined;
-  Camera: undefined;
-};
+// type StackParamList = {
+//   Home: {user: string};
+//   Signup: {user: string; password: string};
+//   Login: {user: string; password: string};
+//   ResetPassword: {name: string};
+//   Print: undefined;
+//   Camera: undefined;
+// };
 
-const Stack = createStackNavigator<StackParamList>();
+const Stack = createStackNavigator();
 
 export default function App(): JSX.Element {
   const [initializing, setInitializing] = useState(true);
@@ -64,7 +64,11 @@ export default function App(): JSX.Element {
 
   if (cameraPermission == null || microphonePermission == null) {
     // still loading
-    return null;
+    return (
+      <View>
+        <Text>Loading...</Text>
+      </View>
+    );
   }
 
   return (

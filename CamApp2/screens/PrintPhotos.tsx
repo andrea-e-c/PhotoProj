@@ -12,16 +12,12 @@ import {X_Pwinty_REST_API_Key, API_URL} from '@env';
 import {useStripe} from '@stripe/stripe-react-native';
 import {SelectList} from 'react-native-dropdown-select-list';
 import makePrintData from '../utils/makePrintData';
-// import * as RNFS from 'react-native-fs';
 import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
 import {addPaymentStatus} from '../redux/action';
 import {useDispatch} from 'react-redux';
 import {getCurrentFolder} from '../utils/getCurrentFolder';
 
-// at end of checkout, go back to camera, it's reset with 27 new photos.
-
-// const dirPath = `${RNFS.DocumentDirectoryPath}/images`;
 const user = auth().currentUser;
 const imgFolderRef = storage().ref(`users/${user?.uid}/images/`);
 const getUserFolder = async () => {
@@ -60,11 +56,9 @@ export default function PrintPhotos({navigation}: {navigation: any}) {
     let urlsArr = [];
     for (const el of arr) {
       let refUrl = `users/${user?.uid}/images/${folder}/image-${el}`;
-      console.log('refUrl', refUrl);
       const url = await storage().ref(refUrl).getDownloadURL();
       urlsArr.push(url);
     }
-    console.log('urls array', urlsArr);
     return urlsArr;
   };
 
@@ -86,7 +80,7 @@ export default function PrintPhotos({navigation}: {navigation: any}) {
 
   const createOrder = async () => {
     const userFolder = await getUserFolder();
-    const photoUrls = await fetchUrls(Array.from(Array(4).keys()), userFolder);
+    const photoUrls = await fetchUrls(Array.from(Array(27).keys()), userFolder);
     const printData = makePrintData(
       photoUrls,
       name,
@@ -98,7 +92,6 @@ export default function PrintPhotos({navigation}: {navigation: any}) {
       shippingType,
       photoSize,
     );
-    console.log('print data', JSON.stringify(printData));
     fetch('https://api.sandbox.prodigi.com/v4.0/Orders', {
       method: 'POST',
       headers: {
@@ -258,6 +251,7 @@ export default function PrintPhotos({navigation}: {navigation: any}) {
           onChangeText={setZip}
           value={zip}
           placeholder="Zip code"
+          keyboardType="numeric"
           style={styles.textInput}
         />
         <Text>Shipping method</Text>
